@@ -1,13 +1,13 @@
 from flask import Blueprint, request
 from flask import jsonify
 from mainapp import db
-from mainapp.models import User,Viptable,Attention,Userfan,Liveadmin,Life,Audience
+from mainapp.models import User,Viptable,Attention,Userfan,Liveadmin,Life,Gift
 from mainapp.serializer import dumps
 
-user_search_blue = Blueprint('user_search_blue', __name__)
+user_function_blue = Blueprint('user_function_blue', __name__)
 
 
-@user_search_blue.route('/search/',methods=('POST',))
+@user_function_blue.route('/search/',methods=('POST',))
 def search_user():
     # 搜索接口
     data = request.get_json()
@@ -30,15 +30,14 @@ def search_user():
 
 
 
-@user_search_blue.route('/see_user/',methods=('GET',))
+@user_function_blue.route('/see_user/',methods=('GET',))
 def see_users():
     # 点击查看他人信息接口
     userid = request.args.get("userid")
-    print(userid)
     user = db.session.query(User).filter(User.userid == userid).first()
     user_attentions = db.session.query(Attention).filter(Attention.userid==user.userid).all()
     user_fans = db.session.query(Userfan).filter(Userfan.flower_user_id == user.userid).all()
-    #vip_class = db.session.query(Viptable).filter(Viptable.vipid==user.vipid).first().vipclass
+    vip_class = db.session.query(Viptable).filter(Viptable.vipid==user.vipid).first()
     if user is None:
         return jsonify({
             'status':1,
@@ -51,7 +50,7 @@ def see_users():
             'userimage': user.userimage,
             'autograph': user.autograph,
             'sex': user.sex,
-            #'vip_class': vip_class,
+            'vip_class':vip_class.vipid if vip_class else "",
             'user_attentions': user_attentions,
             'user_follows': user_fans,
             'user_attention_num': len(user_attentions),
@@ -59,7 +58,7 @@ def see_users():
         })
 
 
-@user_search_blue.route('/edit',methods=('POST',))
+@user_function_blue.route('/edit',methods=('POST',))
 def edit_profile():
     # 修改个人信息接口
     try:
@@ -89,14 +88,17 @@ def edit_profile():
         'msg':'修改成功'
     })
 
-@user_search_blue.route('/getvip/',methods=('POST',))
+@user_function_blue.route('/getvip/',methods=('POST',))
 def get_vip():
     # 充值vip接口
-    userid = request.args.get("userid")
+    data = request.get_json()
+    userid = data.get("userid")
     user = db.session.query(User).filter(User.userid == userid).first()
-    gitvip = request.args.get("getvip")
+    gitvip = data.get("getvip")
+
     if gitvip == '1':
-        if int(user.vipid) >= int(gitvip):
+        a = user.vipid if user.vipid else "0"
+        if int(a) >= int(gitvip):
             return jsonify({
                 'static':2,
                 'msg':'您已经是更高等级的vip了'
@@ -114,12 +116,13 @@ def get_vip():
             })
         else:
             return jsonify({
-                'static':0,
+                'static':1,
                 'msg':'余额不足请充值'
             })
 
     if gitvip == '2':
-        if int(user.vipid) >= int(gitvip):
+        a = user.vipid if user.vipid else "0"
+        if int(a) >= int(gitvip):
             return jsonify({
                 'static':2,
                 'msg':'您已经是更高等级的vip了'
@@ -135,13 +138,15 @@ def get_vip():
                 'static': 0,
                 'msg': '恭喜成为紫V'
             })
+
         else:
             return jsonify({
-                'static':0,
+                'static':1,
                 'msg':'余额不足请充值'
             })
     if gitvip == '3':
-        if int(user.vipid) >= int(gitvip):
+        a = user.vipid if user.vipid else "0"
+        if int(a) >= int(gitvip):
             return jsonify({
                 'static':2,
                 'msg':'您已经是更高等级的vip了'
@@ -157,13 +162,15 @@ def get_vip():
                 'static': 0,
                 'msg': '恭喜成为银冠'
             })
+
         else:
             return jsonify({
-                'static':0,
+                'static':1,
                 'msg':'余额不足请充值'
             })
     if gitvip == '4':
-        if int(user.vipid) >= int(gitvip):
+        a = user.vipid if user.vipid else "0"
+        if int(a) >= int(gitvip):
             return jsonify({
                 'static':2,
                 'msg':'您已经是更高等级的vip了'
@@ -179,13 +186,15 @@ def get_vip():
                 'static': 0,
                 'msg': '恭喜成为皇冠'
             })
+
         else:
             return jsonify({
-                'static':0,
+                'static':1,
                 'msg':'余额不足请充值'
             })
     if gitvip == '5':
-        if int(user.vipid) >= int(gitvip):
+        a = user.vipid if user.vipid else "0"
+        if int(a) >= int(gitvip):
             return jsonify({
                 'static':2,
                 'msg':'您已经是更高等级的vip了'
@@ -201,13 +210,15 @@ def get_vip():
                 'static': 0,
                 'msg': '恭喜成为钻冠'
             })
+
         else:
             return jsonify({
-                'static':0,
+                'static':1,
                 'msg':'余额不足请充值'
             })
     if gitvip == '6':
-        if int(user.vipid) >= int(gitvip):
+        a = user.vipid if user.vipid else "0"
+        if int(a) >= int(gitvip):
             return jsonify({
                 'static':2,
                 'msg':'您已经是更高等级的vip了'
@@ -225,17 +236,18 @@ def get_vip():
             })
         else:
             return jsonify({
-                'static':0,
+                'static':1,
                 'msg':'余额不足请充值'
             })
 
 
-@user_search_blue.route('/recharge/',methods=('POST',))
+@user_function_blue.route('/recharge/',methods=('POST',))
 def recharge():
-    # 充值vip接口
-    userid = request.args.get("userid")
+    # 充值接口
+    data = request.get_json()
+    userid = data.get("userid")
     user = db.session.query(User).filter(User.userid == userid).first()
-    r_charge = request.args.get("r_charge")
+    r_charge = data.get("r_charge")
     balance = user.balance
     new_balance = int(r_charge) * 100000 + int(balance)
     user.balance = new_balance
@@ -246,7 +258,7 @@ def recharge():
         'msg':'充值成功'
     })
 
-@user_search_blue.route('/room_manage/',methods=('POST',))
+@user_function_blue.route('/room_manage/',methods=('POST',))
 def room_manage():
     # 设置房间管理员
     try:
@@ -274,7 +286,7 @@ def room_manage():
             'msg':'添加失败'
         })
 
-@user_search_blue.route('/live_room',methods=('POST',))
+@user_function_blue.route('/live_room',methods=('POST',))
 def liveroom():
     # 直播间接口
     try:
@@ -282,7 +294,10 @@ def liveroom():
         userid = data.get('userid')
         user = db.session.query(User).filter(User.userid == userid).first()
         room = db.session.query(Life).filter(Life.id == user.id).first()
-        room_ip = "rtmp://39.98.126.184:1935/live/"+room
+        r_userid = room.user.userid
+        roomid = room.studiono
+        room_ip = "rtmp://39.98.126.184:1935/live/"+roomid
+        print(room_ip)
         return jsonify({
             "static":"0",
             "msg":"进入直播间成功",
@@ -298,4 +313,42 @@ def liveroom():
         return jsonify({
             "static":1,
             "msg":"出错了，直播间不存在"
+        })
+
+
+@user_function_blue.route('/reward',methods=('POST',))
+def reward():
+    # 送礼物接口
+    data = request.get_json()
+    userid = data.get("userid")
+    user = db.session.query(User).filter(User.userid == userid).first() # 用户
+    roomid = data.get("studiono")
+    room = db.session.query(Life).filter(Life.studiono == roomid).first() # 直播间
+    charismas = room.charisma # 魅力值
+    r_userid = room.user.userid
+    r_user = db.session.query(User).filter(User.userid == r_userid).first() # 房主
+    r_user_balance = r_user.balance # 主播余额
+    g_id = data.get("id")
+    balance = user.balance # 用户余额
+    gift = db.session.query(Gift).filter(Gift.id == g_id).first() # 礼物对象
+    gift_price = gift.giftprice # 礼物价格
+    if int(balance) >= int(gift_price):
+        user.balance = int(balance) - int(gift_price)
+        r_user.balance = int(r_user_balance) + int(gift_price)
+        room.charisma = charismas + int(gift_price)/10
+        db.session.add(user,room)
+        db.session.commit()
+        return jsonify({
+            'static':0,
+            'msg':"赠送成功",
+            'data':{
+                'r_user_balance':r_user.balance,
+                'user_balance':user.balance,
+                'charismas':room.charismas
+            }
+        })
+    else:
+        return jsonify({
+            'static':1,
+            'msg':'余额不足，赠送失败'
         })
