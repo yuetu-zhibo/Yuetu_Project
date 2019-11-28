@@ -346,6 +346,8 @@ def reward():
                 'userimage':user.userimage,
                 'username':user.username,
                 'charismas':room.charisma,
+                'giftimage':gift.image,
+                'giftname':gift.giftname,
             }
         })
     else:
