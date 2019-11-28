@@ -54,7 +54,8 @@ def see_users():
             'user_attentions': user_attentions,
             'user_follows': user_fans,
             'user_attention_num': len(user_attentions),
-            'user_follow_num': len(user_fans)
+            'user_follow_num': len(user_fans),
+            'paper':user.paper if True else False
         })
 
 
@@ -342,9 +343,9 @@ def reward():
             'static':0,
             'msg':"赠送成功",
             'data':{
-                'r_user_balance':r_user.balance,
-                'user_balance':user.balance,
-                'charismas':room.charismas
+                'userimage':user.userimage,
+                'username':user.username,
+                'charismas':room.charisma,
             }
         })
     else:
