@@ -54,3 +54,4 @@ urllib3==1.25.7
 Werkzeug==0.15.6
 WTForms==2.2.1
 zipp==0.6.0
+tornado==5.0
