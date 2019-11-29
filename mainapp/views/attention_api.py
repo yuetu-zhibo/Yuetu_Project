@@ -5,11 +5,8 @@ from mainapp.models import *
 from flask import jsonify, request
 from flask import Blueprint
 
-
 my_blue = Blueprint('attention_blue', __name__)
 
-
-@my_blue.route('/talent/',methods=('POST',))    #才艺
 def get_talent():
     data = request.get_json()
     userid = data["userid"]
@@ -29,10 +26,11 @@ def get_talent():
         vipid = talent.user.vipid
         labels = talent.anchorlabel.labels
         studiono = talent.studiono
+        userid = talent.user.userid
         talent_data = {
             "username":username,
             "images": images,
-            "userid": username,
+            "userid": userid,
             "location": address,
             "vipclass": vipid,
             "tag": labels,
@@ -43,19 +41,22 @@ def get_talent():
         'status': 1,
         'talents': newlist2
     }
-    return jsonify(talents_data)
+    # return jsonify(talents_data)
+    return talents_data
 
-
-@my_blue.route('/near/',methods=('POST',))   #附近
 def get_near():
     data = request.get_json()
     userid = data["userid"]
     user = db.session.query(User).filter(User.userid == userid).first()
-    newlist1 = []
+    newlist2 = []
+    newlist3 = []
     near_list = db.session.query(Life).all()
     if user in near_list:
         near_list.remove(user)
-    for nearuser in near_list:
+    for i in range(12):
+        num1 = random.choice(near_list)
+        newlist2.append(num1)
+    for nearuser in newlist2:
         userids = nearuser.user.userid
         images = nearuser.images
         username = nearuser.user.username
@@ -72,14 +73,13 @@ def get_near():
             "tag":labels,
             "studiono":studiono
         }
-        newlist1.append(near_data)
-    data = {
-        'nears': newlist1
+        newlist3.append(near_data)
+    near_data = {
+        'nears': newlist3
     }
-    return jsonify(data)
+    # return jsonify(data)
+    return near_data
 
-
-@my_blue.route('/attention/', methods=('POST',))  # 关注
 def get_attention():
     data = request.get_json()
     userid = data["userid"]
@@ -126,80 +126,9 @@ def get_attention():
         'recommend': newlist1
 
     }
-    return jsonify(data)
+    # return jsonify(data)
+    return data
 
-
-@my_blue.route('/star/',methods=('POST',))    #新星
-def get_star():
-    data = request.get_json()
-    userid = data["userid"]
-    user = db.session.query(User).filter(User.userid == userid).first()
-    newlist = []
-    newlist1 = []
-    new_list = db.session.query(Life).all()
-    if user in newlist:
-        newlist.remove(user)
-    for i in range(12):
-        num = random.choice(new_list)
-        newlist1.append(num)
-    for newuser in newlist1:
-        images = newuser.images
-        username = newuser.user.username
-        address = newuser.user.address
-        vipid = newuser.user.vipid
-        labels = newuser.anchorlabel.labels
-        studiono = newuser.studiono
-        new_data = {
-            "image": images,
-            "name": username,
-            "address": address,
-            "vipclass": vipid,
-            "labels":labels,
-            "studiono":studiono
-        }
-        newlist.append(new_data)
-    data = {
-        "status":0,
-        "new_data":newlist
-    }
-    return jsonify(data)
-
-
-@my_blue.route('/change/', methods=('POST',))  # 换
-def get_change():
-    data = request.get_json()
-    userid = data["userid"]
-    user = db.session.query(User).filter(User.userid == userid).first()
-    newlist1 = []
-    newlist2 = []
-    reco_list = db.session.query(Life).all()  # **用户主播
-    if user in reco_list:
-        reco_list.remove(user)
-    for i in range(6):
-        num = random.choice(reco_list)
-        newlist1.append(num)
-    for recuser in newlist1:
-        userid = recuser.user.userid
-        username = recuser.user.username
-        userimage = recuser.user.userimage
-        address = recuser.user.address
-        studiono = recuser.studiono
-        rec_data = {
-            "userid": userid,
-            "username": username,
-            "userimage": userimage,
-            "location": address,
-            "studiono": studiono
-        }
-        newlist2.append(rec_data)
-    data = {
-        "data":newlist2
-    }
-
-    return jsonify(data)
-
-
-@my_blue.route('/recommend/', methods=('POST',))  #
 def get_recommend():
     data = request.get_json()
     userid = data["userid"]
@@ -232,13 +161,21 @@ def get_recommend():
         newlist.append(reco_data)
 
     newlist2 = []
-    reco_list1 = db.session.query(Life).all()  # **
-    for recuser in reco_list1:
+    newlist4 = []
+    reco_list2 = db.session.query(Life).all()  # **
+    if user in reco_list2:
+        reco_list.remove(user)
+    for i in range(6):
+        num1 = random.choice(reco_list)
+        newlist4.append(num1)
+    for recuser in newlist4:
         studiono = recuser.studiono
         recname = recuser.user.username
         recimage = recuser.user.userimage
         recadd = recuser.user.address
+        userid = recuser.user.userid
         rec_data = {
+            "userid":userid,
             "username": recname,
             "images": recimage,
             "location": recadd,
@@ -268,44 +205,104 @@ def get_recommend():
         "specialrecommend":newlist,
         "generalrecommend":newlist2
     }
-    return jsonify(data)
+    return data
 
-@my_blue.route('/onclick/', methods=('POST',))  # 关注
-def get_click():
+@my_blue.route('/change/', methods=('POST',))  # 换
+def get_change():
     data = request.get_json()
     userid = data["userid"]
     user = db.session.query(User).filter(User.userid == userid).first()
-    newlist = []
-    attent_list = db.session.query(Attention).filter(Attention.id == user.id).all()  # **用户所有关注
-    for attention in attent_list:
-        newlist.append(attention)
-
     newlist1 = []
-    reco_list = db.session.query(Life).all()  # **用户所有
+    newlist2 = []
+    reco_list = db.session.query(Life).all()  # **用户主播
     if user in reco_list:
-        attent_list.remove(user)
+        reco_list.remove(user)
     for i in range(6):
-        num = random.choice(attent_list)
+        num = random.choice(reco_list)
         newlist1.append(num)
-    for recuser in reco_list:
+    for recuser in newlist1:
+        userid = recuser.user.userid
+        username = recuser.user.username
+        userimage = recuser.user.userimage
+        address = recuser.user.address
+        studiono = recuser.studiono
+        rec_data = {
+            "userid": userid,
+            "username": username,
+            "userimage": userimage,
+            "location": address,
+            "studiono": studiono
+        }
+        newlist2.append(rec_data)
+    data = {
+        "data":newlist2
+    }
+    return jsonify(data)
+
+
+@my_blue.route('/onclick/', methods=('POST',))  # 关注
+def get_click():
+    newlist2 = []
+    newlist3 = []
+    data = request.get_json()
+    adduserid = data["userid"]
+    print(adduserid)
+    attentionid = data["attentionid"]
+    userself = db.session.query(User).filter(User.userid == adduserid).first()
+    newattention = Attention(id = userself.id ,userid=attentionid)
+    db.session.add(newattention)
+    db.session.commit()
+    attent_list = db.session.query(Attention).filter(Attention.id == userself.id ).all()  # **用户所有关注
+    print("Attention", attent_list)
+    for atten in attent_list:
+        if atten:
+            attuser = db.session.query(User).filter(User.userid == atten.userid).first()
+            user_id = attuser.userid
+            attid = attuser.id
+            username = attuser.username
+            userimage = attuser.userimage
+            liveuser = db.session.query(Life).filter(Life.id == attid).first()
+            if liveuser:
+                attstudiono = liveuser.studiono
+            else:
+                attstudiono = ""
+            att_data = {
+                "userid": user_id,
+                "username": username,
+                "userimage": userimage,
+                "studio": attstudiono
+            }
+            newlist3.append(att_data)
+        else:
+            continue
+    reco_list = db.session.query(Life).all()  # **所有直播
+    list1 = []
+    for i in reco_list:
+        if i not in attent_list:
+            list1.append(i)
+    newlist1 = []
+    for _ in range(6):
+        num = random.choice(list1)
+        newlist1.append(num)
+    for recuser in newlist1:
         userid = recuser.user.userid
         studiono = recuser.studiono
         username = recuser.user.username
         userimage = recuser.user.userimage
         address = recuser.user.address
         rec_data = {
-            "userid":userid,
+            "userid": userid,
             "username": username,
             "userimage": userimage,
             "location": address,
             "studiono": studiono
         }
-        newlist1.append(rec_data)
+        newlist2.append(rec_data)
     data = {
-        'recommend': newlist1
+        "allattention":newlist3,
+        'recommend': newlist2
     }
     return jsonify(data)
-
 
 @my_blue.route('/live/', methods=( 'POST',))
 def get_live():
@@ -320,6 +317,36 @@ def get_live():
         "data":"主播所有信息"
     }
     return jsonify(data)
+
+@my_blue.route('/home/', methods=('POST', ))    #home
+def get_pages():
+
+    return jsonify({
+        "recommend":get_recommend(),
+        'attention': get_attention(),
+        'near': get_near(),
+        'talent': get_talent(),
+    })
+
+@my_blue.route('/talent/',methods=('POST',))    #才艺
+def newget_talent():
+    data1 = get_talent()
+    return jsonify(data1)
+
+@my_blue.route('/near/',methods=('POST',))   #附近
+def newget_near():
+    data2 = get_near()
+    return jsonify(data2)
+
+@my_blue.route('/recommend/', methods=('POST',))   #推荐
+def newget_recommend():
+    data3 = get_recommend()
+    return jsonify(data3)
+
+@my_blue.route('/attention/', methods=('POST',))    #关注
+def newget_attention():
+    data4 = get_attention()
+    return jsonify(data4)
 
 
 
