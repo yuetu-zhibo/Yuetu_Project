@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 
 from mainapp import db
-from mainapp.common import sms_
-from mainapp.common.crypo import encode4md5
+from common import sms_
+from common.crypo import encode4md5
 from mainapp.models import User
 
 change_blue = Blueprint('blue4', __name__)

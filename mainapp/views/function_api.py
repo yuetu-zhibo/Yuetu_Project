@@ -12,31 +12,65 @@ def search_user():
     # 搜索接口
     data = request.get_json()
     userid = data.get('userid')
-    s_user = db.session.query(User).filter(User.userid==userid).first()
+    user = db.session.query(User).filter(User.userid == userid).first()
+    user_id = user.id
+    attentioned = db.session.query(Attention).filter(Attention.id == user_id).all()
+    s_userid = data.get('s_userid')
+    s_user = db.session.query(User).filter(User.userid==s_userid).first()
     user_fans = db.session.query(Userfan).filter(Userfan.flower_user_id==s_user.userid).all()
-    #vip_class = db.session.query(Viptable).filter(Viptable.vipid==s_user.vipid).first()
-    if not s_user:
-        return jsonify({
-            'status':1,
-            'msg':'用户不存在'
-        })
-    else:
-        return jsonify({
-            'userimage':s_user.userimage, # 用户头像
-            'username':s_user.username, # 用户名
-            #'vipclass':dumps(vip_class), # vip
-            'user_fans':len(user_fans), # 粉丝数
-        })
+    vip_class = db.session.query(Viptable).filter(Viptable.vipid == s_user.vipid).first()
+    # is_attentions = False
+    # newlist = []
+    # for i in attentioned:
+    #     attentionuserid = i.userid
+    #     newlist.append(attentionuserid)
+    #     if s_userid in newlist:
+    #         return is_attentions == True
+    #     else:
+    #         return is_attentions == False
+    return jsonify({
+        'userimage': s_user.userimage,  # 用户头像
+        'username': s_user.username,  # 用户名
+        'vip_class': vip_class.vipid if vip_class else "",  # vip
+        'user_fans': len(user_fans),  # 粉丝数
+        #'is_attention': is_attentions
+    })
 
 
 
-@user_function_blue.route('/see_user/',methods=('GET',))
+@user_function_blue.route('/see_user',methods=('GET',))
 def see_users():
     # 点击查看他人信息接口
+    newlist1 = []
     userid = request.args.get("userid")
     user = db.session.query(User).filter(User.userid == userid).first()
-    user_attentions = db.session.query(Attention).filter(Attention.userid==user.userid).all()
+    user_attentions = db.session.query(Attention).filter(Attention.attentionid == user.id).all()
+    for useratt in user_attentions:
+        username1 = useratt.user.username
+        userid1 = useratt.user.userid
+        userimage1 = useratt.user.userimage
+        autograph1 = useratt.user.autograph
+        data = {
+            "username":username1,
+            "userid":userid1,
+            "userimage":userimage1,
+            "autograph":autograph1
+        }
+        newlist1.append(data)
+    newlist2 = []
     user_fans = db.session.query(Userfan).filter(Userfan.flower_user_id == user.userid).all()
+    for usefans in user_fans:
+        username = usefans.user.username
+        userid = usefans.user.userid
+        userimage = usefans.user.userimage
+        autograph = usefans.user.autograph
+        data1 = {
+            "username":username,
+            "userid":userid,
+            "userimage":userimage,
+            "autograph":autograph
+        }
+        newlist2.append(data1)
     vip_class = db.session.query(Viptable).filter(Viptable.vipid==user.vipid).first()
     if user is None:
         return jsonify({
@@ -57,7 +91,6 @@ def see_users():
             'user_follow_num': len(user_fans),
             'paper':user.paper if True else False
         })
-
 
 @user_function_blue.route('/edit',methods=('POST',))
 def edit_profile():
@@ -256,7 +289,12 @@ def recharge():
     db.session.commit()
     return jsonify({
         'static':0,
-        'msg':'充值成功'
+        'msg':'充值成功',
+        'data':{
+            'username':user.username,
+            'userid':user.userid,
+            'userimage':user.userimage
+        }
     })
 
 @user_function_blue.route('/room_manage/',methods=('POST',))
@@ -289,16 +327,15 @@ def room_manage():
 
 @user_function_blue.route('/live_room',methods=('POST',))
 def liveroom():
-    # 直播间接口
-    try:
-        data = request.get_json()
-        userid = data.get('userid')
-        user = db.session.query(User).filter(User.userid == userid).first()
-        room = db.session.query(Life).filter(Life.id == user.id).first()
-        r_userid = room.user.userid
-        roomid = room.studiono
-        room_ip = "rtmp://39.98.126.184:1935/live/"+roomid
-        print(room_ip)
+    # 主播开播进入直播间接口
+    data = request.get_json()
+    userid = data.get('userid')
+    user = db.session.query(User).filter(User.userid == userid).first()
+    room = db.session.query(Life).filter(Life.id == user.id).first()
+    roomid = room.studiono
+    room_ip = "rtmp://39.98.126.184:1935/live/" + roomid
+    relname = user.paper if True else False
+    if relname == True:
         return jsonify({
             "static":"0",
             "msg":"进入直播间成功",
@@ -310,12 +347,36 @@ def liveroom():
                 "charisma": room.charisma,
             },
         })
-    except:
+    else:
         return jsonify({
             "static":1,
-            "msg":"出错了，直播间不存在"
+            "msg":"没有进行实名认证，无法开播"
         })
 
+@user_function_blue.route('/in_room',methods=('POST',))
+def in_room():
+    # 观众进入直播间接口
+    data = request.get_json()
+    userid = data.get('userid')
+    studiono = data.get('studiono')
+    user = db.session.query(User).filter(User.userid == userid).first()
+    room_ip = "rtmp://39.98.126.184:1935/live/" + studiono
+    room = db.session.query(Life).filter(Life.studiono == studiono).first()
+    r_user = db.session.query(User).filter(User.id == room.id).first()
+    vip_class = db.session.query(Viptable).filter(Viptable.vipid == user.vipid).first()
+    return jsonify({
+        'static':0,
+        'msg':'进入直播成功',
+        'data':{
+            "room_ip": room_ip,
+            "userid": r_user.userid,
+            "username": r_user.username,
+            "userimage": r_user.userimage,
+            "vipclass":vip_class.vipid if vip_class else "",
+            "charisma": room.charisma,
+            "user_balance":user.balance
+        }
+    })
 
 @user_function_blue.route('/reward',methods=('POST',))
 def reward():
@@ -355,3 +416,7 @@ def reward():
             'static':1,
             'msg':'余额不足，赠送失败'
         })
+
+@user_function_blue.route('/nospake',methods=('POST',))
+def no_spake():
+    pass

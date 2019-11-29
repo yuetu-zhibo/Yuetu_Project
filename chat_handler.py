@@ -1,40 +1,16 @@
-import os
-
-# from flask import request
-from flask import request, jsonify, json
-from tornado.websocket import WebSocketHandler
 from tornado.web import Application
-# from tornado.web import RequestHandler
 from tornado.ioloop import IOLoop
+from tornado.websocket import WebSocketHandler
 
-# from myloginapp.models import Life, User
-
-
-# class IndexHandler(RequestHandler):
-#     def get(self, *args, **kwargs):
-#         # data = request.get_json()
-#         # studiono = data.get('studiono')
-#         # userid = data.get('userid')
-#         userid = self.get_query_argument('userid')
-#         studiono = self.get_query_argument('studiono')
-#         self.render("chat_room.html",userid=userid, studiono=studiono)
-
-
-# chat_handlers = set()  # 用来存储与客户端交互的ChatHandler对象
 from mainapp import db
 from mainapp.models import User, Viptable
 
-all_handlers = {}
+all_handlers = {}  # 用来存储与客户端交互的ChatHandler对象
 
 
 class ChatHandler(WebSocketHandler):  # 服务端支持WebSocket协议
     def open(self, *args, **kwargs):
-        # data = request.get_json()
-        # print(data)
-        # studiono = data.get('studiono')
-        # userid = data.get('userid')
-        userid = self.get_query_argument('userid') # 用户id
-
+        userid = self.get_query_argument('userid')  # 用户id
         user = db.session.query(User).filter(User.userid == userid).first()
         vipid = user.vipid
         vip = db.session.query(Viptable).filter(Viptable.vipid == vipid).first()
@@ -46,7 +22,6 @@ class ChatHandler(WebSocketHandler):  # 服务端支持WebSocket协议
         self.studiono = studiono
         self.username = username
         self.vipclass = vipclass
-        # self.userid = userid
 
         if studiono not in all_handlers.keys():
             all_handlers[studiono] = set()
@@ -56,7 +31,7 @@ class ChatHandler(WebSocketHandler):  # 服务端支持WebSocket协议
 
     def on_message(self, message):
         self.message = message
-        self.send_msg('%s:%s:%s' % (self.vipclass,self.username, self.message))
+        self.send_msg('%s:%s:%s' % (self.vipclass, self.username, self.message))
 
         print(self.username, "正在发消息！")
         print(self.message)
@@ -74,15 +49,8 @@ class ChatHandler(WebSocketHandler):  # 服务端支持WebSocket协议
         return True
 
 
-# settings = {
-#     "template_path": os.path.join(os.getcwd(), 'templates'),
-#     "static_path": os.path.join(os.getcwd(), 'chat_static'),
-#     "debug": True
-# }
 app = Application([
-    # (r'/index/', IndexHandler),
     (r'/chat/', ChatHandler)
 ], )
-# **settings
 app.listen(8888)
 IOLoop.instance().start()

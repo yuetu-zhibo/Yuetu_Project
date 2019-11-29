@@ -1,5 +1,5 @@
 import json
-from mainapp.common import rd2 as rd
+from common import rd2 as rd
 
 import random
 from aliyunsdkcore.client import AcsClient

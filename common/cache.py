@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # coding: utf-8
-from mainapp.common import rd1 as rd
+from common import rd1 as rd
 def add_token(token, user_id):
     # 登录成功后绑定token和user_id
     pass

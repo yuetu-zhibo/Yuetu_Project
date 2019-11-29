@@ -23,6 +23,7 @@ flask-sqlacodegen==1.1.6.1
 Flask-SQLAlchemy==2.4.0
 Flask-WTF==0.14.2
 future==0.18.2
+gunicorn==20.0.4
 idna==2.8
 importlib-metadata==0.23
 inflect==3.0.2
@@ -54,4 +55,3 @@ urllib3==1.25.7
 Werkzeug==0.15.6
 WTForms==2.2.1
 zipp==0.6.0
-tornado==5.0

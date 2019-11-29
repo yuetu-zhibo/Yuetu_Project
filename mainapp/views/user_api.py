@@ -2,18 +2,17 @@
 # coding: utf-8
 import random
 
+import redis
 from flask import Blueprint, request
 from flask import jsonify
 from sqlalchemy.orm import Query
 
 from mainapp import db
-from mainapp.common import sms_
-from mainapp.common.crypo import encode4md5
-from mainapp.common.token_ import new_token
-
+from common import sms_, rd1
+from common.crypo import encode4md5
+from common.token_ import new_token
 
 from mainapp.models import User
-
 
 user_blue = Blueprint('blue1', __name__)
 
@@ -23,11 +22,16 @@ def send_code():
     try:
         # 获取手机号
         phone = request.args.get('phone')
-        sms_.send_code(phone)
+        user = db.session.query(User).filter(User.telphone == phone).first()
+        # if user.telphone is exists:
+        if user:
+            raise Exception("已注册过，请直接登录")
+        else:
+            sms_.send_code(phone)
     except:
         return jsonify({
             'status': 1,
-            'msg': '发送失败，请重试'
+            'msg': '已注册过，请直接登录'
         })
 
     return jsonify({
@@ -36,7 +40,7 @@ def send_code():
     })
 
 
-@user_blue.route('/regist/', methods=('POST', ))
+@user_blue.route('/regist/', methods=('POST',))
 def regist():
     # {"phone": "", "code": ""}
     try:
@@ -44,25 +48,28 @@ def regist():
         phone = data.get('phone')
         code = data.get('code')
         password = data.get('password')
-        print(phone)
-
+        # user = db.session.query(User).filter(User.telphone == phone).first()
+        #         # # if user.telphone is exists:
+        #         # if user:
+        #         #     raise Exception("已注册过，请直接登录")
         if sms_.validate_code(phone, code):
-            userid = random.randint(100000,999999)
-            user = User(userid = userid,telphone = phone,password = encode4md5(password))
+            userid = random.randint(100000, 999999)
+            userimage = "https://hgcdn.handouzb.com/201945/2a62fcb98f3ba090759b1658077ab296.jpeg"
+            user = User(userid=userid, telphone=phone, password=encode4md5(password),userimage=userimage)
             db.session.add(user)
-
-            db.session.commit() # 提交事务
+            db.session.commit()  # 提交事务
     except Exception as e:
         print(e)
         return jsonify({
             'status': 1,
-            'msg': '注册失败'
+            'msg': '已注册过，请直接登录'
         })
 
     return jsonify({
         'status': 0,
         'msg': '注册成功'
     })
+
 
 @user_blue.route('/login/', methods=('POST',))
 def login():
@@ -89,9 +96,15 @@ def login():
         login_user: User = query.first()
         if encode4md5(logpwd) == login_user.password:
             token = new_token()
+            print(token)
+
+            # rd1 = redis.Redis(host='39.98.126.184',db=1,decode_responses=True)
+            user = db.session.query(User).filter(User.telphone == login_user.telphone).first()
+            userid = user.userid
+            rd1.set(userid, token, ex=600)
+            print(token)
 
             # 将token存在redis缓存中
-            login_user.userimage="https://hgcdn.handouzb.com/201701/r1099.jpg"
 
             return jsonify({
                 'status': 0,
@@ -100,8 +113,8 @@ def login():
                 'data': {
                     'telphone': login_user.telphone,
                     'password': login_user.password,
-                    'userid':login_user.userid,
-                    'userimages':login_user.userimage
+                    'userid': login_user.userid,
+                    'userimage':login_user.userimage
                 }
             })
         else:
