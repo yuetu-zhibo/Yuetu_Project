@@ -1,6 +1,7 @@
 import random
 import json
-import redis
+
+from common import rd1
 from mainapp import db
 
 from mainapp.models import Attention, User, Life
@@ -11,10 +12,9 @@ my_blue = Blueprint('attention_blue', __name__)
 
 
 def R_get(tokens):
-    r = redis.Redis(host='39.98.126.184', port=6379, db=1, decode_responses=True)
-    userid = r.get(tokens)
-    print("aaaa")
+    userid = rd1.get(tokens)
     return userid
+
 
 def get_talent():
     data = request.get_data()
