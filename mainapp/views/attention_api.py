@@ -9,7 +9,7 @@ from mainapp.models import *
 from flask import jsonify, request
 from flask import Blueprint
 
-from Yuetu_Project.mainapp.models import User
+from mainapp.models import User
 
 my_blue = Blueprint('attention_blue', __name__)
 
@@ -17,7 +17,6 @@ my_blue = Blueprint('attention_blue', __name__)
 def R_get(tokens):
     r = redis.Redis(host='39.98.126.184', port=6379, db=5, decode_responses=True)
     userid = r.get(tokens)
-    print("aaaa")
     return userid
 
 def get_talent():

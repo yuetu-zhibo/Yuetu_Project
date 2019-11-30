@@ -131,6 +131,7 @@ class Life(Base):
     gifts = Column(String(20))
     images = Column(String(256), nullable=False)
     charisma = Column(Integer)
+    status = Column(String(20))
 
     user = relationship('User', primaryjoin='Life.id == User.id', backref='lives')
     anchorlabel = relationship('Anchorlabel', primaryjoin='Life.labelsid == Anchorlabel.labelsid', backref='lives')
@@ -224,6 +225,7 @@ class User(Base):
     telphone = Column(String(11))
     address = Column(String(20))
     realname = Column(String(50))
+    charisma = Column(String(20))
 
     viptable = relationship('Viptable', primaryjoin='User.vipid == Viptable.vipid', backref='users')
 
