@@ -28,14 +28,11 @@ def send_code():
 
 @change_blue.route('/password/', methods=('POST',))
 def change():
-    # {"phone": "", "code": ""}
     try:
         data = request.get_json()
         password = data.get('password')
         phone = data.get('phone')
         code = data.get('code')
-        print(phone)
-
         if sms_.validate_code(phone, code):
             user = db.session.query(User).filter(User.telphone == phone).first()
             user.password = encode4md5(password)
@@ -47,7 +44,6 @@ def change():
             'status': 1,
             'msg': '修改失败'
         })
-
     return jsonify({
         'status': 0,
         'msg': '修改成功'

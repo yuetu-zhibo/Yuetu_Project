@@ -1,7 +1,5 @@
 from flask import Blueprint, jsonify, request
-
 from mainapp import db
-
 from mainapp.models import User, Userfan, Attention
 
 feel_blue = Blueprint('blue6', __name__)
@@ -55,7 +53,7 @@ def attention():
         attentionid = data.get('attentionid')
         user = db.session.query(User).filter(User.userid == userid).first()
         id = user.id
-        newattention = Attention(id=id,userid=attentionid)
+        newattention = Attention(id=id,userid=user.userid)
         db.session.add(newattention)
         db.session.commit()
     except Exception as e:

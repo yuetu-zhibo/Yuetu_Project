@@ -7,6 +7,7 @@ from flask import Blueprint
 
 my_blue = Blueprint('attention_blue', __name__)
 
+
 def get_talent():
     data = request.get_json()
     userid = data["userid"]
@@ -28,7 +29,7 @@ def get_talent():
         studiono = talent.studiono
         userid = talent.user.userid
         talent_data = {
-            "username":username,
+            "username": username,
             "images": images,
             "userid": userid,
             "location": address,
@@ -43,6 +44,7 @@ def get_talent():
     }
     # return jsonify(talents_data)
     return talents_data
+
 
 def get_near():
     data = request.get_json()
@@ -65,13 +67,13 @@ def get_near():
         labels = nearuser.anchorlabel.labels
         studiono = nearuser.studiono
         near_data = {
-            "userid":userids,
+            "userid": userids,
             "images": images,
             "username": username,
             "location": address,
             "vipclass": vipid,
-            "tag":labels,
-            "studiono":studiono
+            "tag": labels,
+            "studiono": studiono
         }
         newlist3.append(near_data)
     near_data = {
@@ -79,6 +81,7 @@ def get_near():
     }
     # return jsonify(data)
     return near_data
+
 
 def get_attention():
     data = request.get_json()
@@ -95,7 +98,7 @@ def get_attention():
         # for live in attent_list2:
         #     studiono = live.studiono
         att_data = {
-            "userid":userid,
+            "userid": userid,
             # "studiono": studiono,
             "username": username,
             "userimage": userimage,
@@ -114,7 +117,7 @@ def get_attention():
         userimage = recuser.user.userimage
         address = recuser.user.address
         rec_data = {
-            "userid":userid,
+            "userid": userid,
             "username": username,
             "userimage": userimage,
             "location": address,
@@ -128,6 +131,7 @@ def get_attention():
     }
     # return jsonify(data)
     return data
+
 
 def get_recommend():
     data = request.get_json()
@@ -150,7 +154,7 @@ def get_recommend():
         labels = recommend.anchorlabel.labels
         studiono = recommend.studiono
         reco_data = {
-            "userid":users,
+            "userid": users,
             "images": images,
             "username": username,
             "location": address,
@@ -175,7 +179,7 @@ def get_recommend():
         recadd = recuser.user.address
         userid = recuser.user.userid
         rec_data = {
-            "userid":userid,
+            "userid": userid,
             "username": recname,
             "images": recimage,
             "location": recadd,
@@ -198,14 +202,15 @@ def get_recommend():
     newlist3 = []
     for i in bannerlist:
         dict2 = {}
-        dict2["img"]=i
+        dict2["img"] = i
         newlist3.append(dict2)
     data = {
-        "banner":newlist3,
-        "specialrecommend":newlist,
-        "generalrecommend":newlist2
+        "banner": newlist3,
+        "specialrecommend": newlist,
+        "generalrecommend": newlist2
     }
     return data
+
 
 @my_blue.route('/change/', methods=('POST',))  # 换
 def get_change():
@@ -235,7 +240,7 @@ def get_change():
         }
         newlist2.append(rec_data)
     data = {
-        "data":newlist2
+        "data": newlist2
     }
     return jsonify(data)
 
@@ -249,10 +254,10 @@ def get_click():
     print(adduserid)
     attentionid = data["attentionid"]
     userself = db.session.query(User).filter(User.userid == adduserid).first()
-    newattention = Attention(id = userself.id ,userid=attentionid)
+    newattention = Attention(id=userself.id, userid=attentionid)
     db.session.add(newattention)
     db.session.commit()
-    attent_list = db.session.query(Attention).filter(Attention.id == userself.id ).all()  # **用户所有关注
+    attent_list = db.session.query(Attention).filter(Attention.id == userself.id).all()  # **用户所有关注
     print("Attention", attent_list)
     for atten in attent_list:
         if atten:
@@ -299,12 +304,13 @@ def get_click():
         }
         newlist2.append(rec_data)
     data = {
-        "allattention":newlist3,
+        "allattention": newlist3,
         'recommend': newlist2
     }
     return jsonify(data)
 
-@my_blue.route('/live/', methods=( 'POST',))
+
+@my_blue.route('/live/', methods=('POST',))
 def get_live():
     try:
         req_data = request.get_json()
@@ -313,53 +319,41 @@ def get_live():
     except Exception as e:
         print(e)
     data = {
-        "stutus":"你瞌睡吗？",
-        "data":"主播所有信息"
+        "stutus": "你瞌睡吗？",
+        "data": "主播所有信息"
     }
     return jsonify(data)
 
-@my_blue.route('/home/', methods=('POST', ))    #home
-def get_pages():
 
+@my_blue.route('/home/', methods=('POST',))  # home
+def get_pages():
     return jsonify({
-        "recommend":get_recommend(),
+        "recommend": get_recommend(),
         'attention': get_attention(),
         'near': get_near(),
         'talent': get_talent(),
     })
 
-@my_blue.route('/talent/',methods=('POST',))    #才艺
+
+@my_blue.route('/talent/', methods=('POST',))  # 才艺
 def newget_talent():
     data1 = get_talent()
     return jsonify(data1)
 
-@my_blue.route('/near/',methods=('POST',))   #附近
+
+@my_blue.route('/near/', methods=('POST',))  # 附近
 def newget_near():
     data2 = get_near()
     return jsonify(data2)
 
-@my_blue.route('/recommend/', methods=('POST',))   #推荐
+
+@my_blue.route('/recommend/', methods=('POST',))  # 推荐
 def newget_recommend():
     data3 = get_recommend()
     return jsonify(data3)
 
-@my_blue.route('/attention/', methods=('POST',))    #关注
+
+@my_blue.route('/attention/', methods=('POST',))  # 关注
 def newget_attention():
     data4 = get_attention()
     return jsonify(data4)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

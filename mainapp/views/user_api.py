@@ -92,16 +92,11 @@ def login():
         from common.crypo import encode4md5
         if encode4md5(logpwd) == login_user.password:
             token = new_token()
-            print(token)
-
-            # rd1 = redis.Redis(host='39.98.126.184',db=1,decode_responses=True)
             user = db.session.query(User).filter(User.telphone == login_user.telphone).first()
             userid = user.userid
             rd1.set(token, userid, ex=600)
-            print(token)
 
             # 将token存在redis缓存中
-
             return jsonify({
                 'status': 0,
                 'msg': '登录成功',

@@ -1,9 +1,7 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint,jsonify
 
 from mainapp import db
-
-from mainapp.models import User, Gift
-
+from mainapp.models import Gift
 gift_blue = Blueprint('blue3', __name__)
 
 
@@ -21,7 +19,6 @@ def audience():
             "giftname":giftname,
             "giftprice":giftprice
         }
-        # print(gift_data)
         new_list.append(gift_data)
     data = {
         'new': new_list
