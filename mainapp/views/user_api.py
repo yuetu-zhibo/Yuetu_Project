@@ -6,10 +6,11 @@ from flask import Blueprint, request
 from flask import jsonify
 from sqlalchemy.orm import Query
 
+from common.crypo import encode4md5
+from common.token_ import new_token
 from mainapp import db
 from common import sms_, rd1
-from common import encode4md5
-from common import new_token
+
 
 from mainapp.models import User
 
@@ -47,10 +48,6 @@ def regist():
         phone = data.get('phone')
         code = data.get('code')
         password = data.get('password')
-        # user = db.session.query(User).filter(User.telphone == phone).first()
-        #         # # if user.telphone is exists:
-        #         # if user:
-        #         #     raise Exception("已注册过，请直接登录")
         if sms_.validate_code(phone, code):
             userid = random.randint(100000, 999999)
             userimage = "https://hgcdn.handouzb.com/201945/2a62fcb98f3ba090759b1658077ab296.jpeg"
