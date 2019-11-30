@@ -45,6 +45,8 @@ def see_users():
     userid = request.args.get("userid")
     user = db.session.query(User).filter(User.userid == userid).first()
     user_attentions = db.session.query(Attention).filter(Attention.userid == user.userid).all()
+
+
     for useratt in user_attentions:
         username1 = useratt.user.username
         userid1 = useratt.user.userid
@@ -409,7 +411,3 @@ def reward():
             'static':1,
             'msg':'余额不足，赠送失败'
         })
-
-@user_function_blue.route('/nospake',methods=('POST',))
-def no_spake():
-    pass
