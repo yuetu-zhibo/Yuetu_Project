@@ -39,7 +39,6 @@ def interested():
             'userid':userid,
             "focus":0
         }
-        print(user_data)
         new_list.append(user_data)
     data = {
         'new': new_list
