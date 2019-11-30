@@ -1,26 +1,24 @@
-import json
 import random
-
+import json
 import redis
 from mainapp import db
-from middleware.valid_login import is_login
 
-from mainapp.models import *
+from mainapp.models import Attention, User, Life
 from flask import jsonify, request
 from flask import Blueprint
-
-from mainapp.models import User
 
 my_blue = Blueprint('attention_blue', __name__)
 
 
 def R_get(tokens):
-    r = redis.Redis(host='39.98.126.184', port=6379, db=5, decode_responses=True)
+    r = redis.Redis(host='39.98.126.184', port=6379, db=1, decode_responses=True)
     userid = r.get(tokens)
+    print("aaaa")
     return userid
 
 def get_talent():
     data = request.get_data()
+    print(data)
     data = json.loads(data)
     if len(data) != 0:
         userid = R_get(data["token"])
@@ -292,76 +290,6 @@ def get_change():
         return jsonify(data)
 
 
-# @my_blue.route('/onclick/', methods=('POST',))  # 关注
-# def get_click():
-#     newlist2 = []
-#     newlist3 = []
-#     data = request.get_json()
-#     adduserid = data["userid"]
-#     print(adduserid)
-#     attentionid = data["attentionid"]
-#     userself = db.session.query(User).filter(User.userid == adduserid).first()
-#     print(userself)
-#     newattention = Attention(id = userself.id ,userid=attentionid)
-#     db.session.add(newattention)
-#     db.session.commit()
-#     print("aaa")
-#     attent_list = db.session.query(Attention).filter(Attention.id == userself.id ).all()  # **用户所有关注
-#     print("Attention", attent_list)
-#     for atten in attent_list:
-#         if atten:
-#             attuser = db.session.query(User).filter(User.userid == atten.userid).first()
-#             print("atten", atten)
-#             user_id = atten.userid
-#             attid = atten.id
-#             username = attuser.username
-#             userimage = attuser.userimage
-#             print("AAAA",user_id,attid,username,userimage)
-#             liveuser = db.session.query(Life).filter(Life.id == attid).first()
-#             if liveuser:
-#                 attstudiono = liveuser.studiono
-#             else:
-#                 attstudiono = ""
-#             att_data = {
-#                 "userid": user_id,
-#                 "username": username,
-#                 "userimage": userimage,
-#                 "studio": attstudiono
-#             }
-#             newlist3.append(att_data)
-#         else:
-#             continue
-#     reco_list = db.session.query(Life).all()  # **所有直播
-#     list1 = []
-#     for i in reco_list:
-#         if i not in attent_list:
-#             list1.append(i)
-#     newlist1 = []
-#     for _ in range(6):
-#         num = random.choice(list1)
-#         newlist1.append(num)
-#     for recuser in newlist1:
-#         userid = recuser.user.userid
-#         studiono = recuser.studiono
-#         username = recuser.user.username
-#         userimage = recuser.user.userimage
-#         address = recuser.user.address
-#         rec_data = {
-#             "userid": userid,
-#             "username": username,
-#             "userimage": userimage,
-#             "location": address,
-#             "studiono": studiono
-#         }
-#         newlist2.append(rec_data)
-#     data = {
-#         "allattention":newlist3,
-#         'recommend': newlist2
-#     }
-#     return jsonify(data)
-
-
-
 
 @my_blue.route('/home/', methods=('POST', ))    #home
 def get_pages():
@@ -400,8 +328,19 @@ def newget_attention():
 
 
 
-
-
+@my_blue.route('/onlyatt/', methods=('POST',))  # 关注
+def get_only():
+    data = request.get_json()
+    adduserid = data["userid"]
+    attentionid = data["attentionid"]
+    userself = db.session.query(User).filter(User.userid == adduserid).first()
+    newattention = Attention(id = userself.id ,userid=attentionid)
+    db.session.add(newattention)
+    db.session.commit()
+    return jsonify({
+        "status":0,
+        "msg":"关注成功"
+    })
 
 
 

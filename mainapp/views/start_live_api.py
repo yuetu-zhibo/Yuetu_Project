@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 
 from mainapp import db
 from mainapp.models import User
-
 start_blue = Blueprint('blue7', __name__)
 
 

@@ -17,9 +17,7 @@ class ChatHandler(WebSocketHandler):  # 服务端支持WebSocket协议
         vip = db.session.query(Viptable).filter(Viptable.vipid == vipid).first()
         vipclass = vip.vipclass
         username = user.username
-        print(username)
         studiono = self.get_query_argument('studiono')  # 房间id
-        print(studiono)
         self.studiono = studiono
         self.username = username
         self.vipclass = vipclass
@@ -33,14 +31,6 @@ class ChatHandler(WebSocketHandler):  # 服务端支持WebSocket协议
     def on_message(self, message):
         self.message = message
         self.send_msg('%s:%s:%s' % (self.vipclass, self.username, self.message))
-
-        print(self.username, "正在发消息！")
-        print(self.message)
-        print(self.vipclass)
-
-    # def on_close(self):
-    #     all_handlers[self.studiono].remove(self)   # 从集合中移除
-    #     [handler.write_message("%s下线了！" % (self.userid,)) for handler in all_handlers[self.studiono]]
 
     def send_msg(self, msg):
         for username, handler in all_handlers[self.studiono]:
