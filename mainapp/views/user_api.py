@@ -2,15 +2,14 @@
 # coding: utf-8
 import random
 
-import redis
 from flask import Blueprint, request
 from flask import jsonify
 from sqlalchemy.orm import Query
 
-from mainapp import db
-from common import sms_, rd1
 from common.crypo import encode4md5
 from common.token_ import new_token
+from mainapp import db
+from common import sms_, rd1
 
 from mainapp.models import User
 
@@ -48,10 +47,6 @@ def regist():
         phone = data.get('phone')
         code = data.get('code')
         password = data.get('password')
-        # user = db.session.query(User).filter(User.telphone == phone).first()
-        #         # # if user.telphone is exists:
-        #         # if user:
-        #         #     raise Exception("已注册过，请直接登录")
         if sms_.validate_code(phone, code):
             userid = random.randint(100000, 999999)
             userimage = "https://hgcdn.handouzb.com/201945/2a62fcb98f3ba090759b1658077ab296.jpeg"
@@ -94,6 +89,7 @@ def login():
         })
     else:
         login_user: User = query.first()
+        from common.crypo import encode4md5
         if encode4md5(logpwd) == login_user.password:
             token = new_token()
             print(token)
@@ -101,7 +97,7 @@ def login():
             # rd1 = redis.Redis(host='39.98.126.184',db=1,decode_responses=True)
             user = db.session.query(User).filter(User.telphone == login_user.telphone).first()
             userid = user.userid
-            rd1.set(userid, token, ex=600)
+            rd1.set(token, userid, ex=600)
             print(token)
 
             # 将token存在redis缓存中

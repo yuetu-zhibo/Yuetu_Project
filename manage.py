@@ -1,6 +1,7 @@
 from flask_cors import CORS
 from mainapp import app
-from mainapp.views import function_api,user_api,name_test_api,gift_api,change_password_api,attention_api,intereted_api
+from mainapp.views import function_api, user_api, name_test_api, gift_api, change_password_api, attention_api, \
+    intereted_api, start_live_api
 
 
 def make_app():
@@ -11,6 +12,7 @@ def make_app():
     app.register_blueprint(change_password_api.change_blue,url_prefix='/api/change')
     app.register_blueprint(attention_api.my_blue, url_prefix='/api/Attention/')
     app.register_blueprint(intereted_api.feel_blue,url_prefix='/api/feel')
+    app.register_blueprint(start_live_api.start_blue, url_prefix='/api/start')
 
     CORS(app)
     return app

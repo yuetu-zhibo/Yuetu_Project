@@ -1,3 +1,4 @@
+#coding=utf-8
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 from tornado.websocket import WebSocketHandler

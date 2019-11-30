@@ -14,12 +14,12 @@ def search_user():
     userid = data.get('userid')
     user = db.session.query(User).filter(User.userid == userid).first()
     user_id = user.id
-    attentioned = db.session.query(Attention).filter(Attention.id == user_id).all()
+    #attentioned = db.session.query(Attention).filter(Attention.id == user_id).all()
     s_userid = data.get('s_userid')
     s_user = db.session.query(User).filter(User.userid==s_userid).first()
     user_fans = db.session.query(Userfan).filter(Userfan.flower_user_id==s_user.userid).all()
     vip_class = db.session.query(Viptable).filter(Viptable.vipid == s_user.vipid).first()
-    # is_attentions = False
+    is_attentions = 0
     # newlist = []
     # for i in attentioned:
     #     attentionuserid = i.userid
@@ -31,20 +31,20 @@ def search_user():
     return jsonify({
         'userimage': s_user.userimage,  # 用户头像
         'username': s_user.username,  # 用户名
-        'vip_class': vip_class.vipid if vip_class else "",  # vip
-        'user_fans': len(user_fans),  # 粉丝数
-        #'is_attention': is_attentions
+        'vipid': vip_class.vipid if vip_class else "",  # vip
+        'user_follow_num': len(user_fans),  # 粉丝数
+        'userid':user.userid,
+        'focus': is_attentions,
+        'live':True
     })
-
-
 
 @user_function_blue.route('/see_user',methods=('GET',))
 def see_users():
     # 点击查看他人信息接口
-    newlist1 = []
+    fans_list = []
     userid = request.args.get("userid")
     user = db.session.query(User).filter(User.userid == userid).first()
-    user_attentions = db.session.query(Attention).filter(Attention.attentionid == user.id).all()
+    user_attentions = db.session.query(Attention).filter(Attention.userid == user.userid).all()
     for useratt in user_attentions:
         username1 = useratt.user.username
         userid1 = useratt.user.userid
@@ -56,9 +56,9 @@ def see_users():
             "userimage":userimage1,
             "autograph":autograph1
         }
-        newlist1.append(data)
-    newlist2 = []
-    user_fans = db.session.query(Userfan).filter(Userfan.flower_user_id == user.userid).all()
+        fans_list.append(data)
+    attention_list = []
+    user_fans = db.session.query(Attention).filter(Attention.id == user.id).all()
     for usefans in user_fans:
         username = usefans.user.username
         userid = usefans.user.userid
@@ -70,7 +70,7 @@ def see_users():
             "userimage":userimage,
             "autograph":autograph
         }
-        newlist2.append(data1)
+        attention_list.append(data1)
     vip_class = db.session.query(Viptable).filter(Viptable.vipid==user.vipid).first()
     if user is None:
         return jsonify({
@@ -85,10 +85,10 @@ def see_users():
             'autograph': user.autograph,
             'sex': user.sex,
             'vip_class':vip_class.vipid if vip_class else "",
-            'user_attentions': user_attentions,
-            'user_follows': user_fans,
-            'user_attention_num': len(user_attentions),
-            'user_follow_num': len(user_fans),
+            'user_attentions': attention_list,
+            'user_follows': fans_list,
+            'user_attention_num': len(attention_list),
+            'user_follow_num': len(fans_list),
             'paper':user.paper if True else False
         })
 
@@ -274,7 +274,6 @@ def get_vip():
                 'msg':'余额不足请充值'
             })
 
-
 @user_function_blue.route('/recharge/',methods=('POST',))
 def recharge():
     # 充值接口
@@ -331,27 +330,21 @@ def liveroom():
     data = request.get_json()
     userid = data.get('userid')
     user = db.session.query(User).filter(User.userid == userid).first()
-    room = db.session.query(Life).filter(Life.id == user.id).first()
+    room = db.session.query(Life).filter(Life.rec_id == user.id).first()
+    print(room)
     roomid = room.studiono
     room_ip = "rtmp://39.98.126.184:1935/live/" + roomid
-    relname = user.paper if True else False
-    if relname == True:
-        return jsonify({
-            "static":"0",
-            "msg":"进入直播间成功",
-            "data":{
-                "room_ip": room_ip,
-                "userid": user.userid,
-                "username": user.username,
-                "userimage": user.userimage,
-                "charisma": room.charisma,
-            },
-        })
-    else:
-        return jsonify({
-            "static":1,
-            "msg":"没有进行实名认证，无法开播"
-        })
+    return jsonify({
+        "static":"0",
+        "msg":"进入直播间成功",
+        "data":{
+            "room_ip": room_ip,
+            "userid": user.userid,
+            "username": user.username,
+            "userimage": user.userimage,
+            "charisma": room.charisma,
+        },
+    })
 
 @user_function_blue.route('/in_room',methods=('POST',))
 def in_room():
