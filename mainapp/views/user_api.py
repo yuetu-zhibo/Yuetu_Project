@@ -11,7 +11,6 @@ from common.token_ import new_token
 from mainapp import db
 from common import sms_, rd1
 
-
 from mainapp.models import User
 
 user_blue = Blueprint('blue1', __name__)
@@ -90,6 +89,7 @@ def login():
         })
     else:
         login_user: User = query.first()
+        from common.crypo import encode4md5
         if encode4md5(logpwd) == login_user.password:
             token = new_token()
             print(token)
