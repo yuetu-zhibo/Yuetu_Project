@@ -94,7 +94,7 @@ def login():
             token = new_token()
             user = db.session.query(User).filter(User.telphone == login_user.telphone).first()
             userid = user.userid
-            rd1.set(token, userid, ex=600)
+            rd1.set(token, userid, ex=86400)
 
             # 将token存在redis缓存中
             return jsonify({
