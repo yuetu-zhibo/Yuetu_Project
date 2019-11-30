@@ -11,12 +11,8 @@ feel_blue = Blueprint('blue6', __name__)
 def interested():
     data = request.get_json()
     userid = data.get('userid')
-    # attentionid = data.get('attentionid')
     user = db.session.query(User).filter(User.userid == userid).first()
     id = user.id
-    # newattention = Attention(id=id,userid=attentionid)
-    # db.session.add(newattention)
-    # db.session.commit()
     att_list = db.session.query(Attention).filter(Attention.id == id).all()
     user_list = db.session.query(User).all()
     list1 = []
