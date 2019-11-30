@@ -21,20 +21,17 @@ def search_user():
     if len(data) != 0:
         userid = R_get(data["token"])
         user = db.session.query(User).filter(User.userid == userid).first()
-        #attentioned = db.session.query(Attention).filter(Attention.id == user_id).all()
+        attentioned = db.session.query(Attention).filter(Attention.attentionid == user.id).all()
         s_userid = data["s_userid"]
         s_user = db.session.query(User).filter(User.userid==s_userid).first()
         user_fans = db.session.query(Userfan).filter(Userfan.flower_user_id==s_user.userid).all()
         vip_class = db.session.query(Viptable).filter(Viptable.vipid == s_user.vipid).first()
         is_attentions = 0
-        # newlist = []
-        # for i in attentioned:
-        #     attentionuserid = i.userid
-        #     newlist.append(attentionuserid)
-        #     if s_userid in newlist:
-        #         return is_attentions == True
-        #     else:
-        #         return is_attentions == False
+        for i in attentioned:
+            if i == s_userid:
+                is_attentions = 1
+            else:
+                is_attentions = 0
         return jsonify({
             'userimage': s_user.userimage,  # 用户头像
             'username': s_user.username,  # 用户名
@@ -42,7 +39,6 @@ def search_user():
             'user_follow_num': len(user_fans),  # 粉丝数
             'userid':userid,
             'focus': is_attentions,
-            'live':True
         })
     else:
         return jsonify({
@@ -56,7 +52,6 @@ def see_users():
     data = request.args.get('token')
     userid = R_get(data)
     if userid:
-
         fans_list = []
         user = db.session.query(User).filter(User.userid == userid).first()
         user_attentions = db.session.query(Attention).filter(Attention.userid == user.userid).all()
@@ -75,7 +70,7 @@ def see_users():
             }
             fans_list.append(data)
         attention_list = []
-        user_fans = db.session.query(Attention).filter(Attention.id == user.id).all()
+        user_fans = db.session.query(Attention).filter(Attention.attentionid == user.id).all()
         for usefans in user_fans:
             username = usefans.user.username
             userid = usefans.user.userid
@@ -89,6 +84,7 @@ def see_users():
             }
             attention_list.append(data1)
         vip_class = db.session.query(Viptable).filter(Viptable.vipid==user.vipid).first()
+
         if user is None:
             return jsonify({
                 'status':1,
@@ -107,7 +103,8 @@ def see_users():
                 'user_attention_num': len(attention_list),
                 'user_follow_num': len(fans_list),
                 'paper':user.paper if True else False,
-                'islive':islive
+                'islive':islive,
+
             })
     else:
         return jsonify({
@@ -155,7 +152,6 @@ def edit_profile():
 def get_vip():
     # 充值vip接口
     data = request.get_json()
-    print("AAAAAAAAAA",data)
     if len(data) != 0:
         userid = R_get(data["token"])
         user = db.session.query(User).filter(User.userid == userid).first()
@@ -382,6 +378,9 @@ def liveroom():
         user = db.session.query(User).filter(User.userid == userid).first()
         room = db.session.query(Life).filter(Life.rec_id == user.id).first()
         roomid = room.studiono
+        room.status = 1
+        db.session.add(room)
+        db.session.commit()
         room_ip = "rtmp://39.98.126.184:1935/live/" + roomid
         return jsonify({
             "static":"0",
@@ -474,4 +473,25 @@ def reward():
         return jsonify({
             'status':0,
             'msg': "token不存在！"
+        })
+
+@user_function_blue.route('/out_live',methods=('POST',))
+def out_live():
+    data = request.get_json()
+    if len(data) != 0:
+        userid = R_get(data["token"])
+        studiono = data.get("studiono")
+        user = db.session.query(User).filter(User.userid == userid).first()
+        room = db.session.query(Life).filter(Life.studiono == studiono).first()
+        room.status = 0
+        db.session.add(room)
+        db.session.commit()
+        return jsonify({
+            'static':0,
+            'msg':"关闭直播间成功",
+            'data':{
+                'username':user.username,
+                'userimage':user.userimage,
+                'userid':user.userid
+            }
         })
