@@ -2,15 +2,14 @@
 # coding: utf-8
 import random
 
-import redis
 from flask import Blueprint, request
 from flask import jsonify
 from sqlalchemy.orm import Query
 
 from mainapp import db
 from common import sms_, rd1
-from common.crypo import encode4md5
-from common.token_ import new_token
+from common import encode4md5
+from common import new_token
 
 from mainapp.models import User
 
@@ -101,7 +100,7 @@ def login():
             # rd1 = redis.Redis(host='39.98.126.184',db=1,decode_responses=True)
             user = db.session.query(User).filter(User.telphone == login_user.telphone).first()
             userid = user.userid
-            rd1.set(userid, token, ex=600)
+            rd1.set(token, userid, ex=600)
             print(token)
 
             # 将token存在redis缓存中
