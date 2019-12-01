@@ -95,7 +95,7 @@ def month_bang():
 
 
 
-@my_blue1.route('/bang/', methods=('GET', ))    #榜
+@my_blue1.route('/bang', methods=('GET', ))    #榜
 def get_bang():
     rich_data = {
         "day": day_bang(),
@@ -116,7 +116,7 @@ def get_bang():
 
 
 my_blueindex = Blueprint('/Total/',__name__)
-@my_blueindex.route('/total/', methods=('GET',))
+@my_blueindex.route('/total', methods=('GET',))
 def get_total():
     data = request.args.get('token')
     if R_get(data):

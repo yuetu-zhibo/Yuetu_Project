@@ -14,7 +14,7 @@ def R_get(tokens):
     userid = r.get(tokens)
     return userid
 
-@user_function_blue.route('/search/',methods=('POST',))
+@user_function_blue.route('/search',methods=('POST',))
 def search_user():
     # 搜索接口
     data = request.get_json()
@@ -150,7 +150,7 @@ def edit_profile():
         'msg':'修改成功'
     })
 
-@user_function_blue.route('/getvip/',methods=('POST',))
+@user_function_blue.route('/getvip',methods=('POST',))
 def get_vip():
     # 充值vip接口
     data = request.get_json()

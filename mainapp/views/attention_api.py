@@ -247,7 +247,7 @@ def get_recommend():
         return data
 
 
-@my_blue.route('/change/', methods=('POST',))  # 换
+@my_blue.route('/change', methods=('POST',))  # 换
 def get_change():
     data = request.get_data()
     data = json.loads(data)
