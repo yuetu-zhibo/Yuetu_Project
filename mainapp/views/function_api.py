@@ -26,6 +26,8 @@ def search_user():
         s_user = db.session.query(User).filter(User.userid==s_userid).first()
         user_fans = db.session.query(Userfan).filter(Userfan.flower_user_id==s_user.userid).all()
         vip_class = db.session.query(Viptable).filter(Viptable.vipid == s_user.vipid).first()
+        room = db.session.query(Life).filter(Life.rec_id == s_user.id).first()
+        islive = room.status if room else 0
         is_attentions = 0
         for i in attentioned:
             if i == s_userid:
@@ -37,8 +39,9 @@ def search_user():
             'username': s_user.username,  # 用户名
             'vipid': vip_class.vipid if vip_class else "",  # vip
             'user_follow_num': len(user_fans),  # 粉丝数
-            'userid':userid,
+            'userid':s_user.userid,
             'focus': is_attentions,
+            'islive':islive
         })
     else:
         return jsonify({
@@ -56,7 +59,7 @@ def see_users():
         user = db.session.query(User).filter(User.userid == userid).first()
         user_attentions = db.session.query(Attention).filter(Attention.userid == user.userid).all()
         room = db.session.query(Life).filter(Life.rec_id == user.id).first()
-        islive = room.status
+        islive = room.status if room else 0
         for useratt in user_attentions:
             username1 = useratt.user.username
             userid1 = useratt.user.userid
@@ -312,7 +315,7 @@ def recharge():
         userid = R_get(data["token"])
         user = db.session.query(User).filter(User.userid == userid).first()
         r_charge = data.get("r_charge")
-        balance = user.balance
+        balance = user.balance if "" else 0
         new_balance = int(r_charge) * 100000 + int(balance)
         user.balance = new_balance
         db.session.add(user)
@@ -441,7 +444,7 @@ def reward():
         r_user = db.session.query(User).filter(User.userid == r_userid).first() # 房主
         r_user_balance = r_user.balance # 主播余额
         g_id = data.get("id")
-        balance = user.balance # 用户余额
+        balance = user.balance if "" else 0# 用户余额
         gift = db.session.query(Gift).filter(Gift.id == g_id).first() # 礼物对象
         gift_price = gift.giftprice # 礼物价格
         if int(balance) >= int(gift_price):

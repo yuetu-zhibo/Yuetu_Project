@@ -12,7 +12,9 @@ def make_app():
     app.register_blueprint(change_password_api.change_blue,url_prefix='/api/change')
     app.register_blueprint(attention_api.my_blue, url_prefix='/api/Attention/')
     app.register_blueprint(intereted_api.feel_blue,url_prefix='/api/feel')
-    app.register_blueprint(start_live_api.start_blue, url_prefix='/api/start')
+    app.register_blueprint(bang_api.my_blueindex, url_prefix='/api/Total/')
+    app.register_blueprint(bang_api.my_blue1, url_prefix='/api/Bang/')
+
 
     CORS(app)
     return app
