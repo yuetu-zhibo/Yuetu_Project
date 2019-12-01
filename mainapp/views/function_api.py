@@ -155,7 +155,6 @@ def get_vip():
         userid = R_get(data["token"])
         user = db.session.query(User).filter(User.userid == userid).first()
         gitvip = data["getvip"]
-        print("CCCCCCCCCCCC",user,userid)
         if gitvip == '1':
             a = user.vipid if user.vipid else "0"
             if int(a) >= int(gitvip):

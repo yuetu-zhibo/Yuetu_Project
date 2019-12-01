@@ -54,7 +54,6 @@ def regist():
             db.session.add(user)
             db.session.commit()  # 提交事务
     except Exception as e:
-        print(e)
         return jsonify({
             'status': 1,
             'msg': '已注册过，请直接登录'

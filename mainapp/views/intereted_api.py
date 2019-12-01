@@ -83,7 +83,6 @@ def attention():
             }
             return jsonify(data)
     except Exception as e:
-        print(e)
         return jsonify({
             'status': 1,
             'msg': '已关注'
