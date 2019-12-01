@@ -15,7 +15,7 @@ def R_get(tokens):
     return userid
 
 
-@feel_blue.route('/intereted/', methods=('POST',))
+@feel_blue.route('/intereted', methods=('POST',))
 def interested():
     data = request.get_data()
     data = json.loads(data)
@@ -63,7 +63,7 @@ def interested():
         return jsonify(data)
 
 
-@feel_blue.route('/onclick/', methods=('POST',))
+@feel_blue.route('/onclick', methods=('POST',))
 def attention():
     try:
         data = request.get_data()

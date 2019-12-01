@@ -5,7 +5,7 @@ from mainapp.models import Gift
 gift_blue = Blueprint('blue3', __name__)
 
 
-@gift_blue.route('/gift/', methods=('GET',))
+@gift_blue.route('/gift', methods=('GET',))
 def audience():
     new_list = []
     # 礼物清单接口
