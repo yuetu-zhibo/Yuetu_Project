@@ -52,8 +52,13 @@ def search_user():
 @user_function_blue.route('/see_user',methods=('GET',))
 def see_users():
     # 点击查看他人信息接口
-    data = request.args.get('token')
-    userid = R_get(data)
+
+    if request.args.get('token'):
+        data = request.args.get('token')
+        userid = R_get(data)
+    else:
+        userid = request.args.get("userid")
+
     if userid:
         fans_list = []
         user = db.session.query(User).filter(User.userid == userid).first()
@@ -315,9 +320,12 @@ def recharge():
         userid = R_get(data["token"])
         user = db.session.query(User).filter(User.userid == userid).first()
         r_charge = data.get("r_charge")
-        balance = user.balance if "" else 0
+        balance = user.balance if user.balance else 0
+        print(balance)
         new_balance = int(r_charge) * 100000 + int(balance)
+        print(new_balance)
         user.balance = new_balance
+        print(user.balance)
         db.session.add(user)
         db.session.commit()
         return jsonify({
@@ -444,7 +452,7 @@ def reward():
         r_user = db.session.query(User).filter(User.userid == r_userid).first() # 房主
         r_user_balance = r_user.balance # 主播余额
         g_id = data.get("id")
-        balance = user.balance if "" else 0# 用户余额
+        balance = user.balance if user.balance else 0# 用户余额
         gift = db.session.query(Gift).filter(Gift.id == g_id).first() # 礼物对象
         gift_price = gift.giftprice # 礼物价格
         if int(balance) >= int(gift_price):

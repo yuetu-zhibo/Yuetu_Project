@@ -289,7 +289,7 @@ def get_change():
 
 
 
-@my_blue.route('/home/', methods=('POST', ))    #home
+@my_blue.route('/home', methods=('POST', ))    #home
 def get_pages():
 
     return jsonify({
@@ -300,25 +300,25 @@ def get_pages():
     })
 
 
-@my_blue.route('/talent/',methods=('POST',))    #才艺
+@my_blue.route('/talent',methods=('POST',))    #才艺
 def newget_talent():
     data1 = get_talent()
     return jsonify(data1)
 
 
-@my_blue.route('/near/',methods=('POST',))   #附近
+@my_blue.route('/near',methods=('POST',))   #附近
 def newget_near():
     data2 = get_near()
     return jsonify(data2)
 
 
-@my_blue.route('/recommend/', methods=('POST',))   #推荐
+@my_blue.route('/recommend', methods=('POST',))   #推荐
 def newget_recommend():
     data3 = get_recommend()
     return jsonify(data3)
 
 
-@my_blue.route('/attention/', methods=('POST',))    #关注
+@my_blue.route('/attention', methods=('POST',))    #关注
 def newget_attention():
     data4 = get_attention()
     return jsonify(data4)
@@ -326,7 +326,7 @@ def newget_attention():
 
 
 
-@my_blue.route('/onlyatt/', methods=('POST',))  # 关注
+@my_blue.route('/onlyatt', methods=('POST',))  # 关注
 def get_only():
     data = request.get_json()
     adduserid = data["userid"]
