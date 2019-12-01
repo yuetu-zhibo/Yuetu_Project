@@ -18,7 +18,6 @@ def R_get(tokens):
 
 def get_talent():
     data = request.get_data()
-    print(data)
     data = json.loads(data)
     if len(data) != 0:
         userid = R_get(data["token"])
@@ -111,7 +110,6 @@ def get_attention():
     data = json.loads(data)
     if len(data) != 0:
         userid = R_get(data["token"])
-        print("bbb")
         user = db.session.query(User).filter(User.userid == userid).first()
         newlist = []
         attent_list = db.session.query(Attention).filter(Attention.id == user.id).all()  # **用户所有关注

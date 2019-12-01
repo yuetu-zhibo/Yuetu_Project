@@ -1,7 +1,7 @@
 from flask_cors import CORS
 from mainapp import app
 from mainapp.views import function_api, user_api, name_test_api, gift_api, change_password_api, attention_api, \
-    intereted_api, start_live_api
+    intereted_api, start_live_api, bang_api
 
 
 def make_app():

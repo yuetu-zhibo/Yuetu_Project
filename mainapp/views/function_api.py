@@ -124,7 +124,6 @@ def edit_profile():
             username = data.get('username')
             sex = data.get('sex')
             birth = data.get('birth')
-            print(birth)
             autograph = data.get('autograph')
             user.userimage = userimage
             user.username = username
@@ -156,7 +155,6 @@ def get_vip():
         userid = R_get(data["token"])
         user = db.session.query(User).filter(User.userid == userid).first()
         gitvip = data["getvip"]
-        print("CCCCCCCCCCCC",user,userid)
         if gitvip == '1':
             a = user.vipid if user.vipid else "0"
             if int(a) >= int(gitvip):
@@ -372,7 +370,6 @@ def room_manage():
 def liveroom():
     # 主播开播进入直播间接口
     data = request.get_json()
-    print("")
     if len(data) != 0:
         userid = R_get(data["token"])
         user = db.session.query(User).filter(User.userid == userid).first()

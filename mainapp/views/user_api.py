@@ -56,7 +56,6 @@ def regist():
             db.session.add(user)
             db.session.commit()  # 提交事务
     except Exception as e:
-        print(e)
         return jsonify({
             'status': 1,
             'msg': '已注册过，请直接登录'
@@ -96,8 +95,12 @@ def login():
             token = new_token()
             user = db.session.query(User).filter(User.telphone == login_user.telphone).first()
             userid = user.userid
+<<<<<<< HEAD
             rd1.set(token, userid, ex=172800)
             print(token)
+=======
+            rd1.set(token, userid, ex=86400)
+>>>>>>> 841d431788ed8ab38b00c91b093da42fbf3202a6
 
             # 将token存在redis缓存中
             return jsonify({

@@ -39,7 +39,6 @@ def change():
             db.session.add(user)
             db.session.commit()
     except Exception as e:
-        print(e)
         return jsonify({
             'status': 1,
             'msg': '修改失败'
