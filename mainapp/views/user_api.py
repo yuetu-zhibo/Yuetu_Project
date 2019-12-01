@@ -16,7 +16,7 @@ from mainapp.models import User
 user_blue = Blueprint('blue1', __name__)
 
 
-@user_blue.route('/send_code/', methods=('GET',))
+@user_blue.route('/send_code', methods=('GET',))
 def send_code():
     try:
         # 获取手机号
@@ -39,7 +39,7 @@ def send_code():
     })
 
 
-@user_blue.route('/regist/', methods=('POST',))
+@user_blue.route('/regist', methods=('POST',))
 def regist():
     # {"phone": "", "code": ""}
     try:
@@ -50,7 +50,9 @@ def regist():
         if sms_.validate_code(phone, code):
             userid = random.randint(100000, 999999)
             userimage = "https://hgcdn.handouzb.com/201945/2a62fcb98f3ba090759b1658077ab296.jpeg"
-            user = User(userid=userid, telphone=phone, password=encode4md5(password),userimage=userimage)
+            username =  "新用户" + userid
+            autograph = "一个伟大的签名正待产生"
+            user = User(userid=userid, telphone=phone, password=encode4md5(password),userimage=userimage,username=username,autograph=autograph)
             db.session.add(user)
             db.session.commit()  # 提交事务
     except Exception as e:
@@ -65,7 +67,7 @@ def regist():
     })
 
 
-@user_blue.route('/login/', methods=('POST',))
+@user_blue.route('/login', methods=('POST',))
 def login():
     # 获取请求上传的json数据
     # {'name': '', 'pwd': ''}
@@ -93,7 +95,12 @@ def login():
             token = new_token()
             user = db.session.query(User).filter(User.telphone == login_user.telphone).first()
             userid = user.userid
+
+            rd1.set(token, userid, ex=172800)
+            print(token)
+
             rd1.set(token, userid, ex=86400)
+
 
             # 将token存在redis缓存中
             return jsonify({

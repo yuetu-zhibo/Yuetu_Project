@@ -8,7 +8,7 @@ from mainapp.models import User
 change_blue = Blueprint('blue4', __name__)
 
 
-@change_blue.route('/send_code/', methods=('GET',))
+@change_blue.route('/send_code', methods=('GET',))
 def send_code():
     try:
         # 获取手机号
@@ -26,7 +26,7 @@ def send_code():
     })
 
 
-@change_blue.route('/password/', methods=('POST',))
+@change_blue.route('/password', methods=('POST',))
 def change():
     try:
         data = request.get_json()

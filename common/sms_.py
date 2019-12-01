@@ -38,7 +38,7 @@ def send_code(phone):
     code = _gen_code()
 
     # 缓存中存储验证号和手机号
-    rd.set(phone, code, ex=600)  # ex 设置有效时长（秒）
+    rd.set(phone, code, ex=60)  # ex 设置有效时长（秒）
     print(rd.get(phone))
     print(code)
 

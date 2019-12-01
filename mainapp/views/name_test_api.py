@@ -7,7 +7,7 @@ from mainapp.models import User
 test_blue = Blueprint('blue2', __name__)
 
 
-@test_blue.route('/test/', methods=('POST',))
+@test_blue.route('/test', methods=('POST',))
 def name_test():
     # 实名认证接口
     data = request.get_json()

@@ -7,15 +7,15 @@ from mainapp.views.attention_api import R_get
 start_blue = Blueprint('blue7', __name__)
 
 
-@start_blue.route('/live/', methods=('GET',))
+@start_blue.route('/live', methods=('GET',))
 def name_test():
     # 实名认证接口
     data = request.args.get('token')
     if len(data) != 0:
         userid = R_get(data)
         user = db.session.query(User).filter(User.userid == userid).first()
-        paper = user.paper
-        if paper is None:
+        # paper = user.paper
+        if user.paper is None:
             return jsonify({
                 'status': 1,
                 'msg': '请先通过认证'
