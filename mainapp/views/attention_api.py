@@ -326,19 +326,41 @@ def newget_attention():
 
 
 
-@my_blue.route('/onlyatt', methods=('POST',))  # 关注
+@my_blue.route('/onlyatt/', methods=('POST',))  # 关注
 def get_only():
-    data = request.get_json()
-    adduserid = data["userid"]
-    attentionid = data["attentionid"]
-    userself = db.session.query(User).filter(User.userid == adduserid).first()
-    newattention = Attention(id = userself.id ,userid=attentionid)
-    db.session.add(newattention)
-    db.session.commit()
+    data = request.get_data()
+    data = json.loads(data)
+    if len(data) != 0:
+        userid = R_get(data["token"])
+        attentionid = data["attentionid"]
+        userself = db.session.query(User).filter(User.userid == userid).first()
+        newattention = Attention(id = userself.id ,userid=attentionid)
+        db.session.add(newattention)
+        db.session.commit()
     return jsonify({
         "status":0,
         "msg":"关注成功"
     })
+
+@my_blue.route('/delatt/', methods=('POST',))  # 关注
+def get_del():
+    data = request.get_data()
+    data = json.loads(data)
+    if len(data) != 0:
+        userid = R_get(data["token"])
+        attentionid = data["attentionid"]
+        self = db.session.query(User).filter(User.userid == userid).first()
+        self_att = db.session.query(Attention).filter(Attention.userid == attentionid).first()
+        self_list = db.session.query(Attention).filter(Attention.id == self.id).all()
+        if self_att in self_list:
+            db.session.delete(self_att)
+            db.session.commit()
+
+    return jsonify({
+        "status":1,
+        "msg":"取消成功"
+    })
+
 
 
 
